@@ -4,6 +4,7 @@ import { Envelope, WhatsappLogo, MapPin } from '@phosphor-icons/react/ssr';
 import Script from 'next/script';
 import { Providers } from '@/components/providers';
 import { Navbar } from '@/components/navbar';
+import { SITE_URL, SITE_TITLE, SITE_DESCRIPTION } from '@/lib/site';
 import './globals.css';
 
 const inter = Inter({
@@ -28,20 +29,30 @@ const jakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: 'TSV Bahria 1860 — Football Academy in Bahria Town Karachi',
-  description: 'TSV Bahria 1860 is a premier football academy in Bahria Town, Karachi. Train with professional coaches, develop your skills, and join our waitlist today.',
-  keywords: ['football academy', 'TSV Bahria 1860', 'Bahria Town Karachi', 'soccer training', 'youth football', 'football coaching'],
+  metadataBase: new URL(SITE_URL),
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
+  keywords: [
+    'football academy',
+    'TSV Bahria 1860',
+    'Bahria Town Karachi',
+    'German football training',
+    'youth football',
+    'football coaching Karachi',
+    'girls football',
+    'soccer academy Pakistan',
+  ],
   openGraph: {
-    title: 'TSV Bahria 1860 — Football Academy in Bahria Town Karachi',
-    description: 'Train with professional coaches and develop your football skills at TSV Bahria 1860.',
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     type: 'website',
     locale: 'en_US',
     siteName: 'TSV Bahria 1860',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'TSV Bahria 1860 — Football Academy',
-    description: 'Train with professional coaches and develop your football skills at TSV Bahria 1860.',
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
   },
   robots: 'index, follow',
 };

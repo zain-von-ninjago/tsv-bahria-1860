@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 import { HomeClient } from '@/app/HomeClient';
+import { SITE_TITLE, SITE_DESCRIPTION } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: 'TSV Bahria 1860 — German Football Academy in Bahria Town Karachi',
-  description:
-    'Train like a pro — right here in Karachi. Real pro-club training, fitness and smart tactics for players U9 to U23 with Head Coach Zain Rizvi Syed. Join the free waitlist.',
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
   keywords: [
     'football academy',
     'TSV Bahria 1860',

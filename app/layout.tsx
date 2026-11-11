@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono, Plus_Jakarta_Sans } from 'next/font/google';
 import { Envelope, WhatsappLogo, MapPin } from '@phosphor-icons/react/ssr';
 import Script from 'next/script';
+import { Analytics } from '@vercel/analytics/next';
 import { Providers } from '@/components/providers';
 import { Navbar } from '@/components/navbar';
 import './globals.css';
@@ -84,6 +85,7 @@ export default function RootLayout({
         <Providers>
           <Navbar />
           {children}
+          <Analytics />
           <footer className="border-t border-border py-12 md:py-16">
             <div className="container-main">
               <div className="flex flex-col gap-8">

@@ -1,0 +1,1007 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TSV Bahria 1860 — 3D Athlete Biomechanics Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-obsidian: #0A0A0A;
+      --bg-panel: #111111;
+      --text-alabaster: #F4F4F0;
+      --text-muted: #8E8E8A;
+      --accent-lime: #D4FF00;
+      --border-line: rgba(244, 244, 240, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      background-color: var(--bg-obsidian);
+      color: var(--text-alabaster);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+
+    .anatomy-module-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 460px;
+      min-height: 100vh;
+      width: 100%;
+      height: 100%;
+      border-top: 1px solid var(--border-line);
+      border-bottom: 1px solid var(--border-line);
+      position: relative;
+    }
+
+    @media (max-width: 1024px) {
+      .anatomy-module-wrapper {
+        grid-template-columns: 1fr;
+        grid-template-rows: 65vh auto;
+      }
+    }
+
+    .viewport-stage {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 680px;
+      background: radial-gradient(circle at 50% 45%, #171717 0%, #0A0A0A 74%);
+      overflow: hidden;
+      cursor: grab;
+    }
+
+    .viewport-stage:active {
+      cursor: grabbing;
+    }
+
+    #anatomy-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .stage-top-bar {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      right: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      pointer-events: none;
+      z-index: 10;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .brand-header {
+      pointer-events: auto;
+    }
+
+    .eyebrow-tag {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent-lime);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .eyebrow-tag::before {
+      content: "";
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: var(--accent-lime);
+    }
+
+    .stage-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.2rem, 2vw, 1.6rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      text-transform: uppercase;
+    }
+
+    .gender-toggle-group {
+      pointer-events: auto;
+      display: inline-flex;
+      background: rgba(17, 17, 17, 0.9);
+      border: 1px solid var(--border-line);
+      backdrop-filter: blur(8px);
+    }
+
+    .gender-btn {
+      background: transparent;
+      color: var(--text-muted);
+      border: none;
+      padding: 10px 18px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.74rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .gender-btn:first-child {
+      border-right: 1px solid var(--border-line);
+    }
+
+    .gender-btn.active {
+      background: var(--text-alabaster);
+      color: var(--bg-obsidian);
+    }
+
+    .stage-bottom-hud {
+      position: absolute;
+      bottom: 20px;
+      left: 24px;
+      right: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+      z-index: 10;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .quick-view-btns {
+      pointer-events: auto;
+      display: flex;
+      gap: 8px;
+    }
+
+    .hud-btn {
+      background: rgba(17, 17, 17, 0.85);
+      border: 1px solid var(--border-line);
+      color: var(--text-alabaster);
+      padding: 6px 12px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .hud-btn:hover {
+      border-color: var(--accent-lime);
+      color: var(--accent-lime);
+    }
+
+    #leader-lines-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .leader-line {
+      stroke: rgba(244, 244, 240, 0.32);
+      stroke-width: 1.25;
+      stroke-dasharray: 3 3;
+      transition: stroke 0.2s ease, stroke-width 0.2s ease;
+    }
+
+    .leader-line.active {
+      stroke: var(--accent-lime);
+      stroke-width: 2;
+      stroke-dasharray: none;
+    }
+
+    .leader-dot {
+      fill: var(--text-alabaster);
+      transition: fill 0.2s ease, r 0.2s ease;
+    }
+
+    .leader-dot.active {
+      fill: var(--accent-lime);
+    }
+
+    #labels-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 6;
+    }
+
+    .muscle-callout-label {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      pointer-events: auto;
+      background: rgba(10, 10, 10, 0.9);
+      border: 1px solid var(--border-line);
+      color: var(--text-alabaster);
+      padding: 5px 10px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(4px);
+      z-index: 7;
+    }
+
+    .muscle-callout-label .index-num {
+      color: var(--accent-lime);
+      font-weight: 600;
+    }
+
+    .muscle-callout-label.active {
+      background: var(--accent-lime);
+      color: var(--bg-obsidian);
+      border-color: var(--accent-lime);
+      font-weight: 600;
+      z-index: 20;
+    }
+
+    .muscle-callout-label.active .index-num {
+      color: var(--bg-obsidian);
+    }
+
+    .muscle-callout-label.occluded {
+      opacity: 0.16;
+      pointer-events: none;
+    }
+
+    .inspector-sidebar {
+      background: var(--bg-panel);
+      border-left: 1px solid var(--border-line);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 28px 24px;
+      z-index: 15;
+      height: 100%;
+    }
+
+    .inspector-header {
+      border-bottom: 1px solid var(--border-line);
+      padding-bottom: 16px;
+      margin-bottom: 18px;
+    }
+
+    .category-badge {
+      display: inline-block;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 3px 8px;
+      background: rgba(212, 255, 0, 0.12);
+      color: var(--accent-lime);
+      border: 1px solid rgba(212, 255, 0, 0.35);
+      margin-bottom: 10px;
+    }
+
+    .selected-muscle-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+
+    .selected-anatomical-sub {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .detail-blocks {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .detail-card {
+      border: 1px solid var(--border-line);
+      background: rgba(255, 255, 255, 0.015);
+      padding: 14px;
+    }
+
+    .detail-card-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.66rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent-lime);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .detail-card-text {
+      font-size: 0.84rem;
+      line-height: 1.5;
+      color: var(--text-alabaster);
+    }
+
+    .muscle-quick-list {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-line);
+    }
+
+    .quick-list-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .quick-list-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+    }
+
+    .quick-item-btn {
+      background: transparent;
+      border: 1px solid var(--border-line);
+      color: var(--text-muted);
+      padding: 7px 9px;
+      text-align: left;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .quick-item-btn:hover {
+      color: var(--text-alabaster);
+      border-color: rgba(244, 244, 240, 0.4);
+    }
+
+    .quick-item-btn.active {
+      background: var(--text-alabaster);
+      color: var(--bg-obsidian);
+      border-color: var(--text-alabaster);
+      font-weight: 600;
+    }
+
+    .glb-status-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(12, 12, 12, 0.94);
+      border: 1px solid var(--border-line);
+      padding: 24px 28px;
+      max-width: 440px;
+      width: 90%;
+      text-align: center;
+      z-index: 25;
+      backdrop-filter: blur(10px);
+    }
+
+    .glb-status-overlay.hidden {
+      display: none;
+    }
+
+    .status-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      color: var(--accent-lime);
+    }
+
+    .status-desc {
+      font-size: 0.82rem;
+      line-height: 1.5;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .status-code-path {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--text-alabaster);
+      background: #191919;
+      padding: 7px 10px;
+      border: 1px solid var(--border-line);
+      margin-bottom: 12px;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <section class="anatomy-module-wrapper">
+    <div class="viewport-stage" id="viewport-stage">
+      <div class="stage-top-bar">
+        <div class="brand-header">
+          <div class="eyebrow-tag">TSV BAHRIA 1860 — GERMAN S&C &amp; PHYSIO LAB</div>
+          <h1 class="stage-title">3D ATHLETE BIOMECHANICS</h1>
+        </div>
+        <div class="gender-toggle-group" role="group">
+          <button class="gender-btn active" id="btn-male" onclick="setGender('male')">MALE ATHLETE</button>
+          <button class="gender-btn" id="btn-female" onclick="setGender('female')">FEMALE ATHLETE</button>
+        </div>
+      </div>
+
+      <div class="glb-status-overlay" id="glb-status-overlay">
+        <div class="status-title" id="status-title">LOADING REAL .GLB ANATOMY</div>
+        <p class="status-desc" id="status-desc">
+          Male/female ecorche models are loading from <code>/models/</code>. Drag to rotate 360°.
+        </p>
+        <code class="status-code-path">/models/male_ecorche.glb<br>/models/female_ecorche.glb</code>
+      </div>
+
+      <svg id="leader-lines-svg"></svg>
+      <div id="labels-container"></div>
+
+      <div class="stage-bottom-hud">
+        <div>DRAG HORIZONTALLY TO ROTATE 360° (LOCKED Y-AXIS)</div>
+        <div class="quick-view-btns">
+          <button class="hud-btn" onclick="rotateToAngle(0)">FRONT VIEW</button>
+          <button class="hud-btn" onclick="rotateToAngle(Math.PI / 2)">SIDE VIEW</button>
+          <button class="hud-btn" onclick="rotateToAngle(Math.PI)">BACK VIEW</button>
+        </div>
+      </div>
+
+      <canvas id="anatomy-canvas"></canvas>
+    </div>
+
+    <aside class="inspector-sidebar">
+      <div>
+        <div class="inspector-header">
+          <span class="category-badge" id="info-badge">MALE SQUAD FOCUS</span>
+          <h2 class="selected-muscle-title" id="info-title">QUADS &amp; KNEE JOINT</h2>
+          <div class="selected-anatomical-sub" id="info-sub">Quadriceps Femoris &amp; Patellar/ACL Complex</div>
+        </div>
+
+        <div class="detail-blocks">
+          <div class="detail-card">
+            <span class="detail-card-label">01 / WHY IT MATTERS ON THE PITCH</span>
+            <p class="detail-card-text" id="info-importance"></p>
+          </div>
+          <div class="detail-card">
+            <span class="detail-card-label">02 / COACH ZAIN'S TRAINING &amp; PHYSIO GUIDANCE</span>
+            <p class="detail-card-text" id="info-guidance"></p>
+          </div>
+          <div class="detail-card">
+            <span class="detail-card-label">03 / GENDER-SPECIFIC PERFORMANCE NOTE</span>
+            <p class="detail-card-text" id="info-gender-note"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="muscle-quick-list">
+        <div class="quick-list-title">CLICK A TARGET ZONE OR LABEL:</div>
+        <div class="quick-list-grid" id="quick-list-grid"></div>
+      </div>
+    </aside>
+  </section>
+
+  <script src="/three.min.js"></script>
+  <script>
+    const MODEL_PATHS = {
+      male: '/models/male_ecorche.glb',
+      female: '/models/female_ecorche.glb'
+    };
+
+    const ANATOMY_DATA = [
+      {
+        id: 'neck_traps', code: '01', name: 'Neck & Upper Traps',
+        anatomicalName: 'Sternocleidomastoid & Upper Trapezius',
+        targetAngle: 0.15,
+        anchor: { x: 0.12, y: 1.44, z: 0.06 },
+        highlightRadius: { x: 0.24, y: 0.14, z: 0.16 },
+        mirrorX: true,
+        labelOffset: { x: -140, y: -35 },
+        importance: 'Controls head stability for rapid 360° scanning before receiving the ball and winning aerial headers cleanly.',
+        guidance: 'Trained with isometric neck holds and posture drills so you keep your head up under heavy pressing.',
+        maleNote: 'Male Focus: Neck bracing for physical aerial duels against tall center-backs and high-speed headers.',
+        femaleNote: 'Female Focus: Essential neck and upper-back strength to absorb heading impact and reduce concussion risk.'
+      },
+      {
+        id: 'chest_delts', code: '02', name: 'Chest & Shoulders',
+        anatomicalName: 'Pectoralis Major & Anterior/Lateral Deltoid',
+        targetAngle: -0.35,
+        anchor: { x: -0.22, y: 1.22, z: 0.12 },
+        highlightRadius: { x: 0.34, y: 0.18, z: 0.18 },
+        mirrorX: true,
+        labelOffset: { x: 145, y: -25 },
+        importance: 'Used to shield the ball with your upper body, hold off defenders in 1v1 battles, and stay balanced at top speed.',
+        guidance: 'Push-up variations, medicine ball chest throws, and shoulder stability bands to prevent shoulder dislocations.',
+        maleNote: 'Male Focus: Upper-body armor for shoulder-to-shoulder challenges in senior U19–U23 football.',
+        femaleNote: 'Female Focus: Upper-body frame stability so female players can protect the ball confidently.'
+      },
+      {
+        id: 'core_obliques', code: '03', name: 'Core & Obliques',
+        anatomicalName: 'Rectus Abdominis & External Obliques',
+        targetAngle: 0.25,
+        anchor: { x: 0.11, y: 0.88, z: 0.14 },
+        highlightRadius: { x: 0.22, y: 0.22, z: 0.16 },
+        mirrorX: true,
+        labelOffset: { x: -145, y: -10 },
+        importance: 'Connects your upper and lower body. Every hard shot, long pass, and quick turn starts from a locked core.',
+        guidance: 'Anti-rotation planks, rotational med-ball slams, and hanging leg raises—zero useless sit-ups.',
+        maleNote: 'Male Focus: High-torque rotational power for long diagonal switches and driven shots outside the box.',
+        femaleNote: 'Female Focus: Pelvic and trunk control to keep the hips level during fast directional cuts.'
+      },
+      {
+        id: 'hip_groin', code: '04', name: 'Hips & Adductors (Groin)',
+        anatomicalName: 'Iliopsoas & Adductor Longus/Magnus',
+        targetAngle: -0.25,
+        anchor: { x: -0.11, y: 0.52, z: 0.10 },
+        highlightRadius: { x: 0.18, y: 0.18, z: 0.16 },
+        mirrorX: true,
+        labelOffset: { x: 150, y: 10 },
+        importance: 'Powers cross-body passes, whip on free-kicks, and sideways defensive shuffling. One of the most injured areas in football.',
+        guidance: 'Copenhagen adductor planks and hip mobility flows before every pitch session to stop groin strains before they happen.',
+        maleNote: 'Male Focus: Protecting the groin and pubic bone against high-load shooting and rapid change-of-direction.',
+        femaleNote: 'Female Focus: Strengthening hip abductors and adductors to support wider pelvic angles and prevent inward knee collapse.'
+      },
+      {
+        id: 'quads_knee', code: '05', name: 'Quads & Knee Joint',
+        anatomicalName: 'Quadriceps Femoris & Patellar/ACL Complex',
+        targetAngle: 0.3,
+        anchor: { x: 0.15, y: 0.20, z: 0.12 },
+        highlightRadius: { x: 0.16, y: 0.28, z: 0.16 },
+        mirrorX: true,
+        labelOffset: { x: -150, y: 15 },
+        importance: 'Your main engine for explosive 5-meter sprints, jumping, shooting power, and braking safely when pressing opponents.',
+        guidance: 'Single-leg squats, Spanish squats, and landing mechanics so your knees stay rock-solid during sharp turns.',
+        maleNote: 'Male Focus: Building maximum concentric sprint power and heavy deceleration strength for 90-minute match intensity.',
+        femaleNote: 'Female Focus: CRITICAL ACL PROTECTION. Female players face a 3–6x higher ACL risk; we train VMO quad control and soft landing alignment every week.'
+      },
+      {
+        id: 'lats_back', code: '06', name: 'Lats & Spinal Erectors',
+        anatomicalName: 'Latissimus Dorsi & Erector Spinae',
+        targetAngle: Math.PI - 0.3,
+        anchor: { x: 0.16, y: 1.10, z: -0.12 },
+        highlightRadius: { x: 0.26, y: 0.26, z: 0.16 },
+        mirrorX: true,
+        labelOffset: { x: 145, y: -20 },
+        importance: 'Drives powerful arm swing during maximum sprinting and protects your lower spine when shielding the ball.',
+        guidance: 'Pull-ups, inverted rows, and posterior chain extensions integrated into our weekly German S&C blocks.',
+        maleNote: 'Male Focus: Building a wide, strong back that cannot be knocked off the ball by physical defenders.',
+        femaleNote: 'Female Focus: Postural endurance so players maintain sprint mechanics in the final 20 minutes of a match.'
+      },
+      {
+        id: 'glutes_pelvis', code: '07', name: 'Glutes & Posterior Hip',
+        anatomicalName: 'Gluteus Maximus & Gluteus Medius',
+        targetAngle: Math.PI + 0.3,
+        anchor: { x: -0.14, y: 0.65, z: -0.14 },
+        highlightRadius: { x: 0.22, y: 0.18, z: 0.18 },
+        mirrorX: true,
+        labelOffset: { x: -145, y: -5 },
+        importance: 'The most important powerhouse muscle for top-end sprint speed, jumping for headers, and stabilizing the knee.',
+        guidance: 'Barbell/banded hip thrusts, single-leg Romanian deadlifts, and monster walks during warm-ups.',
+        maleNote: 'Male Focus: Explosive horizontal force production to beat defenders in the first 3 steps.',
+        femaleNote: 'Female Focus: Glute medius activation keeps the thigh bone aligned and stops the knee from caving inward on landings.'
+      },
+      {
+        id: 'hamstrings', code: '08', name: 'Hamstrings',
+        anatomicalName: 'Biceps Femoris & Semitendinosus',
+        targetAngle: Math.PI - 0.25,
+        anchor: { x: 0.15, y: 0.25, z: -0.11 },
+        highlightRadius: { x: 0.16, y: 0.26, z: 0.16 },
+        mirrorX: true,
+        labelOffset: { x: 145, y: 10 },
+        importance: 'Controls high-speed sprinting stride and acts as the natural brake for the knee joint (ACL agonist).',
+        guidance: 'Nordic hamstring curls and high-speed sprint exposure—proven in German football to cut hamstring tears by over 50%.',
+        maleNote: 'Male Focus: Eccentric length and strength so players can sprint full speed in transition without pulling a muscle.',
+        femaleNote: 'Female Focus: Balancing quad-to-hamstring strength ratios so the hamstrings actively protect the ACL during sudden stops.'
+      },
+      {
+        id: 'calves_achilles', code: '09', name: 'Calves & Ankle / Achilles',
+        anatomicalName: 'Gastrocnemius, Soleus & Achilles Tendon',
+        targetAngle: Math.PI + 0.25,
+        anchor: { x: -0.14, y: -0.32, z: -0.09 },
+        highlightRadius: { x: 0.16, y: 0.28, z: 0.16 },
+        mirrorX: true,
+        labelOffset: { x: -150, y: 25 },
+        importance: 'Acts like a stiff spring every time your boot hits the turf—essential for quick footwork, agility, and ankle safety.',
+        guidance: 'Pogo hops, single-leg calf raises, and barefoot balance drills to bulletproof ankles on artificial turf (Kunstrasen).',
+        maleNote: 'Male Focus: Tendon stiffness for reactive agility and explosive push-off.',
+        femaleNote: 'Female Focus: Ankle proprioception and ligament stability to prevent common ankle sprains on uneven pitches.'
+      }
+    ];
+
+    const stageEl = document.getElementById('viewport-stage');
+    const canvasEl = document.getElementById('anatomy-canvas');
+    const svgEl = document.getElementById('leader-lines-svg');
+    const labelsContainerEl = document.getElementById('labels-container');
+    const statusOverlayEl = document.getElementById('glb-status-overlay');
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(34, stageEl.clientWidth / stageEl.clientHeight, 0.1, 100);
+    camera.position.set(0, 0.55, 4.25);
+    camera.lookAt(0, 0.48, 0);
+
+    const renderer = new THREE.WebGLRenderer({ canvas: canvasEl, antialias: true, alpha: true, powerPreference: 'high-performance' });
+    renderer.setSize(stageEl.clientWidth, stageEl.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.40));
+    const keyLight = new THREE.DirectionalLight(0xfffef8, 1.25);
+    keyLight.position.set(2.6, 4.0, 3.2);
+    keyLight.castShadow = true;
+    scene.add(keyLight);
+    const fillLight = new THREE.DirectionalLight(0xd0d8e0, 0.50);
+    fillLight.position.set(-3.0, 1.5, 2.0);
+    scene.add(fillLight);
+    const rimLight = new THREE.DirectionalLight(0xffffff, 0.95);
+    rimLight.position.set(0, 3.2, -3.5);
+    scene.add(rimLight);
+
+    const platformMesh = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.85, 0.92, 0.04, 64),
+      new THREE.MeshStandardMaterial({ color: 0x151515, roughness: 0.8, metalness: 0.2 })
+    );
+    platformMesh.position.y = -0.77;
+    platformMesh.receiveShadow = true;
+    scene.add(platformMesh);
+
+    const ringMesh = new THREE.Mesh(
+      new THREE.RingGeometry(0.82, 0.84, 64),
+      new THREE.MeshBasicMaterial({ color: 0xd4ff00, side: THREE.DoubleSide, transparent: true, opacity: 0.5 })
+    );
+    ringMesh.rotation.x = Math.PI / 2;
+    ringMesh.position.y = -0.748;
+    scene.add(ringMesh);
+
+    const highlightUniforms = {
+      uTargetCenter: { value: new THREE.Vector3(0.15, 0.20, 0.12) },
+      uTargetRadius: { value: new THREE.Vector3(0.16, 0.28, 0.16) },
+      uMirrorX: { value: 1.0 },
+      uHighlightColor: { value: new THREE.Color(0xD4FF00) }
+    };
+
+    const unifiedEcorcheMaterial = new THREE.MeshStandardMaterial({
+      color: 0xE6E6E1,
+      roughness: 0.44,
+      metalness: 0.08
+    });
+
+    unifiedEcorcheMaterial.onBeforeCompile = (shader) => {
+      shader.uniforms.uTargetCenter = highlightUniforms.uTargetCenter;
+      shader.uniforms.uTargetRadius = highlightUniforms.uTargetRadius;
+      shader.uniforms.uMirrorX = highlightUniforms.uMirrorX;
+      shader.uniforms.uHighlightColor = highlightUniforms.uHighlightColor;
+
+      shader.vertexShader = `varying vec3 vNormalizedLocalPos;` + shader.vertexShader;
+      shader.vertexShader = shader.vertexShader.replace(
+        '#include <begin_vertex>',
+        `#include <begin_vertex>\nvNormalizedLocalPos = (modelMatrix * vec4(position, 1.0)).xyz;`
+      );
+
+      shader.fragmentShader = `
+        uniform vec3 uTargetCenter;
+        uniform vec3 uTargetRadius;
+        uniform float uMirrorX;
+        uniform vec3 uHighlightColor;
+        varying vec3 vNormalizedLocalPos;
+      ` + shader.fragmentShader;
+
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <dithering_fragment>',
+        `
+        vec3 p = vNormalizedLocalPos;
+        vec3 d1 = (p - uTargetCenter) / uTargetRadius;
+        float dist = length(d1);
+        if (uMirrorX > 0.5) {
+          vec3 mirroredCenter = vec3(-uTargetCenter.x, uTargetCenter.y, uTargetCenter.z);
+          vec3 d2 = (p - mirroredCenter) / uTargetRadius;
+          dist = min(dist, length(d2));
+        }
+        float zoneMask = 1.0 - smoothstep(0.65, 1.15, dist);
+        if (zoneMask > 0.01) {
+          gl_FragColor.rgb = mix(gl_FragColor.rgb, uHighlightColor, zoneMask * 0.78);
+        }
+        #include <dithering_fragment>
+        `
+      );
+    };
+
+    const athleteRoot = new THREE.Group();
+    scene.add(athleteRoot);
+
+    const loadedModelsCache = { male: null, female: null };
+
+    const dracoLoader = new THREE.DRACOLoader();
+    dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.4.1/');
+
+    const gltfLoader = new THREE.GLTFLoader();
+    gltfLoader.setDRACOLoader(dracoLoader);
+
+    function normalizeAndApplyUnifiedMaterial(gltfScene) {
+      const wrapper = new THREE.Group();
+      wrapper.add(gltfScene);
+
+      const box = new THREE.Box3().setFromObject(gltfScene);
+      const size = new THREE.Vector3();
+      const center = new THREE.Vector3();
+      box.getSize(size);
+      box.getCenter(center);
+
+      const targetHeight = 2.44;
+      const scaleFactor = targetHeight / (size.y || 1);
+      gltfScene.scale.setScalar(scaleFactor);
+
+      const scaledBox = new THREE.Box3().setFromObject(gltfScene);
+      const scaledCenter = new THREE.Vector3();
+      scaledBox.getCenter(scaledCenter);
+
+      gltfScene.position.x = -scaledCenter.x;
+      gltfScene.position.z = -scaledCenter.z;
+      gltfScene.position.y = -0.75 - scaledBox.min.y;
+
+      gltfScene.traverse((child) => {
+        if (child.isMesh) {
+          child.material = unifiedEcorcheMaterial;
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
+      });
+
+      return wrapper;
+    }
+
+    function loadGenderGLB(gender) {
+      while (athleteRoot.children.length > 0) {
+        athleteRoot.remove(athleteRoot.children[0]);
+      }
+
+      if (loadedModelsCache[gender]) {
+        athleteRoot.add(loadedModelsCache[gender]);
+        statusOverlayEl.classList.add('hidden');
+        return;
+      }
+
+      const url = MODEL_PATHS[gender];
+      gltfLoader.load(
+        url,
+        (gltf) => {
+          const normalizedModel = normalizeAndApplyUnifiedMaterial(gltf.scene);
+          loadedModelsCache[gender] = normalizedModel;
+          if (currentGender === gender) {
+            athleteRoot.add(normalizedModel);
+            statusOverlayEl.classList.add('hidden');
+          }
+        },
+        undefined,
+        () => {
+          statusOverlayEl.classList.remove('hidden');
+        }
+      );
+    }
+
+    let currentGender = 'male';
+    let activeMuscleId = 'quads_knee';
+    let currentRotationY = 0.25;
+    let targetRotationY = 0.25;
+    let isDragging = false;
+    let previousPointerX = 0;
+
+    function initCalloutUI() {
+      labelsContainerEl.innerHTML = '';
+      svgEl.innerHTML = '';
+      const quickGrid = document.getElementById('quick-list-grid');
+      quickGrid.innerHTML = '';
+
+      ANATOMY_DATA.forEach(item => {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('id', `line-${item.id}`);
+        line.setAttribute('class', 'leader-line');
+        svgEl.appendChild(line);
+
+        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        dot.setAttribute('id', `dot-${item.id}`);
+        dot.setAttribute('r', '3.5');
+        dot.setAttribute('class', 'leader-dot');
+        svgEl.appendChild(dot);
+
+        const labelBtn = document.createElement('button');
+        labelBtn.className = 'muscle-callout-label';
+        labelBtn.id = `label-${item.id}`;
+        labelBtn.innerHTML = `<span class="index-num">${item.code}</span> <span>${item.name}</span>`;
+        labelBtn.onclick = (e) => {
+          e.stopPropagation();
+          selectMuscle(item.id, true);
+        };
+        labelsContainerEl.appendChild(labelBtn);
+
+        const quickBtn = document.createElement('button');
+        quickBtn.className = 'quick-item-btn';
+        quickBtn.id = `quick-${item.id}`;
+        quickBtn.textContent = `${item.code}. ${item.name}`;
+        quickBtn.onclick = () => selectMuscle(item.id, true);
+        quickGrid.appendChild(quickBtn);
+      });
+    }
+
+    function selectMuscle(muscleId, rotateToTarget = false) {
+      activeMuscleId = muscleId;
+      const data = ANATOMY_DATA.find(m => m.id === muscleId);
+      if (!data) return;
+
+      highlightUniforms.uTargetRadius.value.set(data.highlightRadius.x, data.highlightRadius.y, data.highlightRadius.z);
+      highlightUniforms.uMirrorX.value = data.mirrorX ? 1.0 : 0.0;
+
+      if (rotateToTarget) {
+        const twoPi = Math.PI * 2;
+        let diff = (data.targetAngle - currentRotationY) % twoPi;
+        if (diff > Math.PI) diff -= twoPi;
+        if (diff < -Math.PI) diff += twoPi;
+        targetRotationY = currentRotationY + diff;
+      }
+
+      ANATOMY_DATA.forEach(item => {
+        const isCurrent = item.id === muscleId;
+        document.getElementById(`label-${item.id}`)?.classList.toggle('active', isCurrent);
+        document.getElementById(`line-${item.id}`)?.classList.toggle('active', isCurrent);
+        document.getElementById(`dot-${item.id}`)?.classList.toggle('active', isCurrent);
+        document.getElementById(`quick-${item.id}`)?.classList.toggle('active', isCurrent);
+      });
+
+      document.getElementById('info-badge').textContent =
+        currentGender === 'male' ? 'MALE SQUAD FOCUS' : 'FEMALE SQUAD FOCUS';
+      document.getElementById('info-title').textContent = data.name.toUpperCase();
+      document.getElementById('info-sub').textContent = data.anatomicalName;
+      document.getElementById('info-importance').textContent = data.importance;
+      document.getElementById('info-guidance').textContent = data.guidance;
+      document.getElementById('info-gender-note').textContent =
+        currentGender === 'male' ? data.maleNote : data.femaleNote;
+    }
+
+    function setGender(gender) {
+      currentGender = gender;
+      document.getElementById('btn-male').classList.toggle('active', gender === 'male');
+      document.getElementById('btn-female').classList.toggle('active', gender === 'female');
+      loadGenderGLB(gender);
+      selectMuscle(activeMuscleId, false);
+    }
+
+    function rotateToAngle(angleRad) {
+      const twoPi = Math.PI * 2;
+      let diff = (angleRad - currentRotationY) % twoPi;
+      if (diff > Math.PI) diff -= twoPi;
+      if (diff < -Math.PI) diff += twoPi;
+      targetRotationY = currentRotationY + diff;
+    }
+
+    stageEl.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('button') || e.target.closest('label')) return;
+      isDragging = true;
+      previousPointerX = e.clientX;
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (!isDragging) return;
+      const deltaX = e.clientX - previousPointerX;
+      previousPointerX = e.clientX;
+      targetRotationY += deltaX * 0.0085;
+    });
+
+    window.addEventListener('pointerup', () => {
+      isDragging = false;
+    });
+
+    const tempVec = new THREE.Vector3();
+    const normalVec = new THREE.Vector3();
+    const camDirVec = new THREE.Vector3();
+    const yAxis = new THREE.Vector3(0, 1, 0);
+
+    function updateCalloutsAndShaderCenter() {
+      const width = stageEl.clientWidth;
+      const height = stageEl.clientHeight;
+
+      const activeData = ANATOMY_DATA.find(m => m.id === activeMuscleId);
+      if (activeData) {
+        tempVec.set(activeData.anchor.x, activeData.anchor.y, activeData.anchor.z);
+        tempVec.applyAxisAngle(yAxis, athleteRoot.rotation.y);
+        highlightUniforms.uTargetCenter.value.copy(tempVec);
+      }
+
+      ANATOMY_DATA.forEach(item => {
+        tempVec.set(item.anchor.x, item.anchor.y, item.anchor.z);
+        tempVec.applyAxisAngle(yAxis, athleteRoot.rotation.y);
+
+        normalVec.set(item.anchor.x * 0.4, 0, item.anchor.z).normalize();
+        normalVec.applyAxisAngle(yAxis, athleteRoot.rotation.y);
+        camDirVec.subVectors(camera.position, tempVec).normalize();
+        const facingDot = normalVec.dot(camDirVec);
+
+        const projected = tempVec.clone().project(camera);
+        const anchorX = (projected.x * 0.5 + 0.5) * width;
+        const anchorY = (-(projected.y * 0.5) + 0.5) * height;
+
+        const pushDir = anchorX >= width * 0.5 ? 1 : -1;
+        const offsetMag = Math.min(Math.abs(item.labelOffset.x), width * 0.24);
+        const labelX = Math.max(95, Math.min(width - 95, anchorX + pushDir * offsetMag));
+        const labelY = Math.max(85, Math.min(height - 65, anchorY + item.labelOffset.y));
+
+        const labelEl = document.getElementById(`label-${item.id}`);
+        const lineEl = document.getElementById(`line-${item.id}`);
+        const dotEl = document.getElementById(`dot-${item.id}`);
+
+        if (labelEl && lineEl && dotEl) {
+          labelEl.style.left = `${labelX}px`;
+          labelEl.style.top = `${labelY}px`;
+
+          lineEl.setAttribute('x1', anchorX);
+          lineEl.setAttribute('y1', anchorY);
+          lineEl.setAttribute('x2', labelX);
+          lineEl.setAttribute('y2', labelY);
+
+          dotEl.setAttribute('cx', anchorX);
+          dotEl.setAttribute('cy', anchorY);
+
+          const isOccluded = facingDot < -0.12 && item.id !== activeMuscleId;
+          labelEl.classList.toggle('occluded', isOccluded);
+          lineEl.style.opacity = isOccluded ? '0.08' : '1';
+          dotEl.style.opacity = isOccluded ? '0.12' : '1';
+        }
+      });
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      currentRotationY += (targetRotationY - currentRotationY) * 0.1;
+      athleteRoot.rotation.y = currentRotationY;
+      updateCalloutsAndShaderCenter();
+      renderer.render(scene, camera);
+    }
+
+    window.addEventListener('resize', () => {
+      camera.aspect = stageEl.clientWidth / stageEl.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(stageEl.clientWidth, stageEl.clientHeight);
+    });
+
+    initCalloutUI();
+    loadGenderGLB('male');
+    selectMuscle('quads_knee', false);
+    animate();
+  </script>
+</body>
+</html>

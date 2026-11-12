@@ -1220,6 +1220,7 @@ function Waitlist() {
                       <div>
                         <label className="block text-small text-foreground-muted mb-2">Category *</label>
                         <select
+                          aria-label="Category"
                           value={form.category}
                           onChange={set('category')}
                           className="w-full rounded-xl bg-background border border-border px-4 py-3 text-foreground focus:border-accent focus:outline-none transition-colors"
@@ -1232,6 +1233,7 @@ function Waitlist() {
                       <div>
                         <label className="block text-small text-foreground-muted mb-2">Favoured Position *</label>
                         <select
+                          aria-label="Favoured Position"
                           value={form.position}
                           onChange={set('position')}
                           className="w-full rounded-xl bg-background border border-border px-4 py-3 text-foreground focus:border-accent focus:outline-none transition-colors"
@@ -1262,6 +1264,7 @@ function Waitlist() {
                           Current Playing Level *
                         </label>
                         <select
+                          aria-label="Current Playing Level"
                           value={form.experience}
                           onChange={set('experience')}
                           className="w-full rounded-xl bg-background border border-border px-4 py-3 text-foreground focus:border-accent focus:outline-none transition-colors"

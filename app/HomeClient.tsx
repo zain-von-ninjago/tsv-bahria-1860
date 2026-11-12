@@ -302,8 +302,8 @@ function HeroBackground() {
           glow={0.5}
           vignette={0.7}
           markers="plus"
-          mouseInteraction={true}
-          pulseOnClick={true}
+          mouseInteraction={false}
+          pulseOnClick={false}
         />
       ) : (
         <AcidSquares

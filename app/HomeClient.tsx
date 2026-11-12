@@ -297,11 +297,11 @@ function HeroBackground() {
           backgroundColor="#050508"
           material="glass"
           placement="full"
-          count={24}
-          speed={0.5}
-          glow={0.5}
+          count={12}
+          speed={0.3}
+          glow={0.3}
           vignette={0.7}
-          markers="plus"
+          markers="none"
           mouseInteraction={false}
           pulseOnClick={false}
         />
@@ -311,12 +311,12 @@ function HeroBackground() {
           color="#0a3328"
           accentColor="#00d4aa"
           secondaryColor="#e8c56d"
-          tileSize={46}
+          tileSize={60}
           gap={6}
           roundness={12}
-          gloss={0.4}
-          speed={0.45}
-          waves={2}
+          gloss={0.3}
+          speed={0.3}
+          waves={1}
           waveScale={0.7}
           shape="round"
           lighting="backlit"

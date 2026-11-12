@@ -15,7 +15,6 @@ import FlipCard from '@/components/reactbits/FlipCard';
 import ScrollExpand from '@/components/reactbits/ScrollExpand';
 import InfiniteSpiral from '@/components/reactbits/InfiniteSpiral';
 import DepthText from '@/components/reactbits/DepthText';
-import AcidSquares from '@/components/reactbits/AcidSquares';
 import AeroShards from '@/components/reactbits/AeroShards';
 import { AnatomyLab } from '@/components/anatomy-lab/AnatomyLab';
 import { useIsMobile, useIsTouchOnly, useIsDesktop } from '@/components/hooks';
@@ -275,55 +274,23 @@ export function HomeClient() {
 
 // â”€â”€â”€ Hero background (WebGPU shards when available, acid fallback) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function HeroBackground() {
-  const [webgpu, setWebgpu] = useState(false);
-  useEffect(() => {
-    const nav = navigator as Navigator & { gpu?: unknown };
-    if (nav.gpu) {
-      // Probe it actually initializes in this browser
-      (nav.gpu as { requestAdapter?: () => Promise<unknown> })
-        .requestAdapter?.()
-        .then((a) => setWebgpu(!!a))
-        .catch(() => setWebgpu(false));
-    }
-  }, []);
-
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none hidden sm:block bg-[#050508]" aria-hidden="true">
-      {webgpu ? (
-        <AeroShards
-          className="absolute inset-0"
-          shardColor="#0b141a"
-          accentColor="#00d4aa"
-          backgroundColor="#050508"
-          material="glass"
-          placement="full"
-          count={12}
-          speed={0.3}
-          glow={0.3}
-          vignette={0.7}
-          markers="none"
-          mouseInteraction={false}
-          pulseOnClick={false}
-        />
-      ) : (
-        <AcidSquares
-          className="absolute inset-0"
-          color="#0a3328"
-          accentColor="#00d4aa"
-          secondaryColor="#e8c56d"
-          tileSize={60}
-          gap={6}
-          roundness={12}
-          gloss={0.3}
-          speed={0.3}
-          waves={1}
-          waveScale={0.7}
-          shape="round"
-          lighting="backlit"
-          hoverEffect="none"
-          detail="low"
-        />
-      )}
+      <AeroShards
+        className="absolute inset-0"
+        shardColor="#0b141a"
+        accentColor="#00d4aa"
+        backgroundColor="#050508"
+        material="glass"
+        placement="full"
+        count={12}
+        speed={0.3}
+        glow={0.3}
+        vignette={0.7}
+        markers="none"
+        mouseInteraction={false}
+        pulseOnClick={false}
+      />
       {/* readability scrims */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,#050508_88%)]" />
       <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-background to-transparent" />

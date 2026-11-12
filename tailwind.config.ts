@@ -36,9 +36,9 @@ const config: Config = {
         secondary: '#e8c56d',
       },
       fontFamily: {
-        display: ['Plus Jakarta Sans', 'Geist', 'system-ui', 'sans-serif'],
-        sans: ['Geist', 'system-ui', 'sans-serif'],
-        mono: ['Geist Mono', 'JetBrains Mono', 'monospace'],
+        display: ['var(--font-display)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-mono)', 'monospace'],
       },
       fontSize: {
         'hero': ['clamp(3.5rem, 8vw, 8rem)', { lineHeight: '0.95', letterSpacing: '-0.03em', fontWeight: '600' }],

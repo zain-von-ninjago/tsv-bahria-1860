@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap');
-
 :root {
   --bg: #050508;
   --fg: #f8f8f8;
@@ -30,7 +28,7 @@ html {
 }
 
 body {
-  font-family: 'Geist', system-ui, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
   background-color: var(--bg);
   color: var(--fg);
   overflow-x: hidden;

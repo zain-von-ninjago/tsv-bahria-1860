@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono, Plus_Jakarta_Sans } from 'next/font/google';
 import { Envelope, WhatsappLogo, MapPin } from '@phosphor-icons/react/ssr';
-import Script from 'next/script';
 import { Providers } from '@/components/providers';
 import { Navbar } from '@/components/navbar';
 import { SITE_URL, SITE_TITLE, SITE_DESCRIPTION } from '@/lib/site';
@@ -71,23 +70,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${jakartaSans.variable} dark`}>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <Script src="/three.min.js" strategy="beforeInteractive" />
-        <Script
-          src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"
-          strategy="afterInteractive"
-        />
-        <Script
-          src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"
-          strategy="afterInteractive"
-        />
-        <Script
-          src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"
-          strategy="afterInteractive"
-        />
-      </head>
       <body className="min-h-screen bg-background font-sans antialiased">
         <div className="fixed inset-0 -z-10 radial-glow-accent" aria-hidden="true" />
         <div className="fixed inset-0 -z-10 radial-glow-gold" aria-hidden="true" />
@@ -101,8 +83,12 @@ export default function RootLayout({
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                   <div className="flex items-center gap-3">
                     <img
-                      src="/logo/tsv-bahria-1860-nobg.png"
+                      src="/logo/tsv-bahria-1860-nobg.webp"
                       alt="TSV Bahria 1860 logo"
+                      width={40}
+                      height={40}
+                      loading="lazy"
+                      decoding="async"
                       className="h-10 w-10 object-contain"
                     />
                     <div>
@@ -119,7 +105,7 @@ export default function RootLayout({
                     <a href="#coach" className="hover:text-accent transition-colors">Meet the Coach</a>
                     <a href="#success" className="hover:text-accent transition-colors">Success Stories</a>
                     <a href="#training" className="hover:text-accent transition-colors">How We Train</a>
-                    <a href="#waitlist" className="hover:text-accent transition-colors">Age Groups &amp; Fees</a>
+                    <a href="#contact" className="hover:text-accent transition-colors">Contact</a>
                   </nav>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 pt-6 border-t border-border/40">

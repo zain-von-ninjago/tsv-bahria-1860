@@ -18,6 +18,7 @@ import DepthText from '@/components/reactbits/DepthText';
 import AcidSquares from '@/components/reactbits/AcidSquares';
 import AeroShards from '@/components/reactbits/AeroShards';
 import { AnatomyLab } from '@/components/anatomy-lab/AnatomyLab';
+import { useIsMobile, useIsTouchOnly, useIsDesktop } from '@/components/hooks';
 
 // â”€â”€â”€ Contact constants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const WHATSAPP_NUMBER = '4915757292178'; // +49 15757292178
@@ -249,6 +250,12 @@ export function HomeClient() {
   const heroY = useTransform(scrollYProgress, [0, 0.2], [0, -80]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.25], [1, 0]);
 
+  // Mobile / touch devices keep the cursor layer mounted but idle, so the page
+  // tree is never torn down and rebuilt after hydration.
+  const isMobile = useIsMobile();
+  const isTouchOnly = useIsTouchOnly();
+  const isDesktop = useIsDesktop();
+
   return (
     <SwarmCursor
       count={70}
@@ -258,6 +265,7 @@ export function HomeClient() {
       idle="roam"
       clickEffect="burst"
       targets="a, button, input, select, textarea"
+      enabled={!isMobile && !isTouchOnly}
       className="contents"
     >
       <main id="top" className="relative min-h-screen pb-24 md:pb-0">
@@ -269,7 +277,7 @@ export function HomeClient() {
         <MediaMoment />
         <HowWeTrain />
         <HeritageBand />
-        <SpiralReel />
+        {isDesktop && <SpiralReel />}
         <Waitlist />
         <ContactStrip />
       </main>
@@ -355,7 +363,7 @@ function Hero({ y, opacity, reduce }: { y: any; opacity: any; reduce: boolean })
               transition={{ delay: 0.15, duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
             >
               <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
-              KARACHI, PAKISTAN &mdash; REAL GERMAN FOOTBALL TRAINING
+              KARACHI, PAKISTAN &mdash; REAL PRO-CLUB FOOTBALL TRAINING
             </motion.div>
 
             <motion.h1
@@ -415,8 +423,9 @@ function Hero({ y, opacity, reduce }: { y: any; opacity: any; reduce: boolean })
               transition={{ delay: 0.2, duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
             >
               <motion.img
-                src="/logo/tsv-bahria-1860-modern.png"
+                src="/logo/tsv-bahria-1860-modern.webp"
                 alt="TSV Bahria 1860 crest"
+                decoding="async"
                 className="h-40 md:h-52 w-auto drop-shadow-[0_0_60px_rgba(0,212,170,0.35)]"
                 whileHover={{ scale: 1.04, rotate: 2 }}
                 transition={{ type: 'spring', stiffness: 220, damping: 16 }}
@@ -480,7 +489,7 @@ function WhyJoinUs() {
         <div className="text-center mb-16">
           <div className="eyebrow eyebrow-accent mb-6 mx-auto">Why Join Us</div>
           <h2 className="text-section font-display font-bold tracking-tight text-foreground uppercase">
-            <SplitText text="What Makes Us Different?" className="block" />
+            <SplitText text="What Makes Us Different?" className="block justify-center" />
           </h2>
         </div>
 
@@ -562,6 +571,7 @@ function WhyJoinUs() {
 // â”€â”€â”€ Section 3: Meet the Coach â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function Coach() {
   const [activeShowcase, setActiveShowcase] = useState(0);
+  const isMobile = useIsMobile();
 
   return (
     <section id="coach" className="section bg-background-elevated/30 overflow-hidden">
@@ -569,7 +579,7 @@ function Coach() {
         <div className="text-center mb-16">
           <div className="eyebrow eyebrow-accent mb-6 mx-auto">Meet the Coach</div>
           <h2 className="text-section font-display font-bold tracking-tight text-foreground uppercase">
-            <SplitText text="Learn from someone who lived it." className="block" />
+            <SplitText text="Learn from someone who lived it." className="block justify-center" />
           </h2>
         </div>
 
@@ -624,7 +634,7 @@ function Coach() {
               curve={0.55}
               tilt={10}
               perspective={1200}
-              autoplay="drift"
+              autoplay={isMobile ? 'off' : 'drift'}
               speed={0.28}
               interval={3200}
               direction="right"
@@ -734,6 +744,7 @@ function Coach() {
 
 // â”€â”€â”€ Section 4: Success Stories (scanner backdrop + particle banner + flips) â”€
 function SuccessStories() {
+  const isMobile = useIsMobile();
   return (
     <section id="success" className="section relative overflow-hidden">
       {/* Subtle animated backdrop (CSS only, no canvas flash) */}
@@ -760,30 +771,37 @@ function SuccessStories() {
               <div className="text-center mb-8">
                 <div className="eyebrow eyebrow-accent mb-6 mx-auto">Success Stories</div>
               </div>
-              <div className="relative h-[130px] sm:h-[170px] md:h-[220px] w-full">
-                <ParticleText
-                  className="h-full w-full"
-                  text="2 PLAYERS. 2 NATIONAL TEAMS."
-                  color="#f8f8f8"
-                  highlightColor="#00d4aa"
-                  highlightMode="motion"
-                  intro="gather"
-                  clickBurst={true}
-                  pointerRepel={45}
-                  repelRadius={90}
-                  idleDrift={0.4}
-                  glow={true}
-                  fontSize="clamp(1.6rem, 5.2vw, 3.4rem)"
-                  fontWeight={800}
-                  fontFamily="'Plus Jakarta Sans', system-ui, sans-serif"
-                />
+              <div className="relative h-[130px] sm:h-[170px] md:h-[220px] w-full flex items-center justify-center">
+                {isMobile ? (
+                  <h3 className="font-display font-extrabold uppercase tracking-tight leading-[1.05] text-[clamp(1.9rem,8vw,2.6rem)] text-foreground">
+                    2 Players.<br />
+                    <span className="text-accent">2 National Teams.</span>
+                  </h3>
+                ) : (
+                  <ParticleText
+                    className="h-full w-full"
+                    text="2 PLAYERS. 2 NATIONAL TEAMS."
+                    color="#f8f8f8"
+                    highlightColor="#00d4aa"
+                    highlightMode="motion"
+                    intro="gather"
+                    clickBurst={true}
+                    pointerRepel={45}
+                    repelRadius={90}
+                    idleDrift={0.4}
+                    glow={true}
+                    fontSize="clamp(1.6rem, 5.2vw, 3.4rem)"
+                    fontWeight={800}
+                    fontFamily="var(--font-display), system-ui, sans-serif"
+                  />
+                )}
               </div>
               <p className="text-body-lg text-foreground-muted max-w-2xl mx-auto mt-6">
                 The best proof of a good coach is how much his players improve. Zain trained two
                 players 1-on-1 back in Bavaria, and both of them were chosen for their country&apos;s youth
                 national teams.
               </p>
-              <p className="text-micro text-foreground-subtle mt-3">
+              <p className="hidden md:block text-micro text-foreground-subtle mt-3">
                 (The headline is made of live particles &mdash; move your cursor through it, click to bust it up.)
               </p>
             </div>
@@ -855,7 +873,7 @@ function MediaMoment() {
       <div className="container-main mb-8 text-center">
         <div className="eyebrow eyebrow-accent mb-6 mx-auto">Inside European Football</div>
         <h2 className="text-section font-display font-bold tracking-tight text-foreground uppercase">
-          <SplitText text="This is the level we train for." className="block" />
+          <SplitText text="This is the level we train for." className="block justify-center" />
         </h2>
       </div>
       <ScrollExpand
@@ -877,13 +895,14 @@ function MediaMoment() {
 
 // â”€â”€â”€ Section 5: How We Train (+ PaperCrumple interactive) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function HowWeTrain() {
+  const isDesktop = useIsDesktop();
   return (
     <section id="training" className="section bg-background-elevated/30">
       <div className="container-main">
         <div className="text-center mb-16">
           <div className="eyebrow eyebrow-accent mb-6 mx-auto">How We Train</div>
           <h2 className="text-section font-display font-bold tracking-tight text-foreground uppercase">
-            <SplitText text="What players actually do here" className="block" />
+            <SplitText text="What players actually do here" className="block justify-center" />
           </h2>
         </div>
         <div className="grid sm:grid-cols-2 gap-6 max-w-5xl mx-auto">
@@ -912,8 +931,8 @@ function HowWeTrain() {
           })}
         </div>
 
-        {/* 3D Athlete Biomechanics Lab (GLB anatomy model) */}
-        <AnatomyLab />
+        {/* 3D Athlete Biomechanics Lab (desktop only — phones skip it for speed) */}
+        {isDesktop && <AnatomyLab />}
       </div>
     </section>
   );
@@ -921,6 +940,7 @@ function HowWeTrain() {
 
 // â”€â”€â”€ 1860 Heritage band (DepthText) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function HeritageBand() {
+  const isMobile = useIsMobile();
   return (
     <section className="section-tight py-20 md:py-28">
       <div className="container-main text-center">
@@ -933,11 +953,11 @@ function HeritageBand() {
             faceColor="#f8f8f8"
             depthColor="#00d4aa"
             gradientDepth
-            pointerTracking
-            autoOrbit
+            pointerTracking={!isMobile}
+            autoOrbit={!isMobile}
             orbitSpeed={0.6}
             hoverPush={26}
-            float
+            float={!isMobile}
             fontSize="clamp(4.5rem, 16vw, 10rem)"
             fontWeight={800}
             intro
@@ -1000,11 +1020,15 @@ function Waitlist() {
   });
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [contactMissing, setContactMissing] = useState(false);
 
   const age = parseInt(form.age, 10);
   const validAge = !isNaN(age) && age >= 7 && age <= 23;
   const squad = validAge ? squadForAge(age) : null;
   const stage = validAge ? stageForAge(age) : null;
+
+  const canWhatsapp = form.whatsapp.trim().length >= 6;
+  const canEmail = /.+@.+\..+/.test(form.email.trim());
 
   const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm({ ...form, [key]: e.target.value });
@@ -1020,19 +1044,28 @@ function Waitlist() {
       `Playing Level: ${form.experience}`,
       `Strengths & Weaknesses: ${form.strengths || '\u2014'}`,
       `Past Injuries: ${form.injuries || 'None'}`,
-      `WhatsApp: ${form.whatsapp}`,
-      `Email: ${form.email}`,
+      `WhatsApp: ${form.whatsapp || '\u2014'}`,
+      `Email: ${form.email || '\u2014'}`,
     ].join('\n');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validAge) return;
+    // Either WhatsApp or email is enough to send the waitlist entry
+    if (!canWhatsapp && !canEmail) {
+      setContactMissing(true);
+      return;
+    }
     setSubmitting(true);
-    window.open(
-      `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(buildMessage())}`,
-      '_blank',
-      'noopener,noreferrer'
-    );
+    if (canWhatsapp) {
+      window.open(
+        `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(buildMessage())}`,
+        '_blank',
+        'noopener,noreferrer'
+      );
+    } else {
+      window.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent('TSV Bahria 1860 — Free Waitlist Sign-Up')}&body=${encodeURIComponent(buildMessage())}`;
+    }
     setTimeout(() => {
       setSubmitting(false);
       setSubmitted(true);
@@ -1045,7 +1078,7 @@ function Waitlist() {
         <div className="text-center mb-16">
           <div className="eyebrow eyebrow-accent mb-6 mx-auto">Age Groups &amp; Fees</div>
           <h2 className="text-section font-display font-bold tracking-tight text-foreground uppercase">
-            <SplitText text="Join the free waitlist" className="block" />
+            <SplitText text="Join the free waitlist" className="block justify-center" />
           </h2>
           <p className="text-body-lg text-foreground-muted max-w-2xl mx-auto mt-4">
             Pick your age and see exactly which team you join and how we train you. No guesswork.
@@ -1116,22 +1149,26 @@ function Waitlist() {
                       Didn&apos;t open? Use the buttons below.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                      <a
-                        href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(buildMessage())}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn-primary !py-3 !px-6 !text-small"
-                      >
-                        <PhosphorIcons.Whatsapp className="h-5 w-5" strokeWidth={2} />
-                        Open WhatsApp Again
-                      </a>
-                      <a
-                        href={`mailto:${EMAIL}?subject=${encodeURIComponent('TSV Bahria 1860 â€” Free Waitlist Sign-Up')}&body=${encodeURIComponent(buildMessage())}`}
-                        className="btn-secondary !py-3 !px-6 !text-small"
-                      >
-                        <PhosphorIcons.Mail className="h-5 w-5" strokeWidth={2} />
-                        Send via Email
-                      </a>
+                      {canWhatsapp && (
+                        <a
+                          href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(buildMessage())}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn-primary !py-3 !px-6 !text-small"
+                        >
+                          <PhosphorIcons.Whatsapp className="h-5 w-5" strokeWidth={2} />
+                          Open WhatsApp Again
+                        </a>
+                      )}
+                      {canEmail && (
+                        <a
+                          href={`mailto:${EMAIL}?subject=${encodeURIComponent('TSV Bahria 1860 — Free Waitlist Sign-Up')}&body=${encodeURIComponent(buildMessage())}`}
+                          className="btn-secondary !py-3 !px-6 !text-small"
+                        >
+                          <PhosphorIcons.Mail className="h-5 w-5" strokeWidth={2} />
+                          Send via Email
+                        </a>
+                      )}
                     </div>
                   </div>
                 ) : (
@@ -1253,11 +1290,10 @@ function Waitlist() {
 
                     <div>
                       <label className="block text-small text-foreground-muted mb-2">
-                        Your Main Strengths &amp; Weaknesses *
+                        Your Main Strengths &amp; Weaknesses <span className="opacity-60">(optional)</span>
                       </label>
                       <textarea
-                        required
-                        rows={2}
+                        rows={3}
                         value={form.strengths}
                         onChange={set('strengths')}
                         className="w-full rounded-xl bg-background border border-border px-4 py-3 text-foreground focus:border-accent focus:outline-none transition-colors resize-none"
@@ -1288,7 +1324,7 @@ function Waitlist() {
                           value={form.injuries}
                           onChange={set('injuries')}
                           className="w-full rounded-xl bg-background border border-border px-4 py-3 text-foreground focus:border-accent focus:outline-none transition-colors"
-                          placeholder="Helps Coach Zain plan safe physio & strength work"
+                          placeholder="e.g. None, or a past knee injury"
                         />
                       </div>
                     </div>
@@ -1296,25 +1332,23 @@ function Waitlist() {
                     <div className="grid md:grid-cols-2 gap-5">
                       <div>
                         <label className="block text-small text-foreground-muted mb-2">
-                          Parent / Player WhatsApp Number *
+                          Parent / Player WhatsApp Number
                         </label>
                         <input
-                          required
                           type="tel"
                           value={form.whatsapp}
-                          onChange={set('whatsapp')}
-                          className="w-full rounded-xl bg-background border border-border px-4 py-3 text-foreground focus:border-accent focus:outline-none transition-colors"
+                          onChange={(e) => { set('whatsapp')(e); setContactMissing(false); }}
+                          className={`w-full rounded-xl bg-background border px-4 py-3 text-foreground focus:outline-none transition-colors ${contactMissing ? 'border-red-500/70' : 'border-border focus:border-accent'}`}
                           placeholder="+92 300 0000000"
                         />
                       </div>
                       <div>
-                        <label className="block text-small text-foreground-muted mb-2">Email Address *</label>
+                        <label className="block text-small text-foreground-muted mb-2">Email Address</label>
                         <input
-                          required
                           type="email"
                           value={form.email}
-                          onChange={set('email')}
-                          className="w-full rounded-xl bg-background border border-border px-4 py-3 text-foreground focus:border-accent focus:outline-none transition-colors"
+                          onChange={(e) => { set('email')(e); setContactMissing(false); }}
+                          className={`w-full rounded-xl bg-background border px-4 py-3 text-foreground focus:outline-none transition-colors ${contactMissing ? 'border-red-500/70' : 'border-border focus:border-accent'}`}
                           placeholder="you@email.com"
                         />
                       </div>
@@ -1326,11 +1360,10 @@ function Waitlist() {
                       className="btn-primary w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                     >
                       <PhosphorIcons.Whatsapp className="h-5 w-5" strokeWidth={2} />
-                      {submitting ? 'Opening WhatsApp...' : 'Join the Free Waitlist'}
+                      {submitting ? 'Sending...' : 'Join the Free Waitlist'}
                     </button>
                     <p className="text-micro text-foreground-muted text-center">
-                      Submitting opens WhatsApp with your details pre-filled for Coach Zain
-                      ({WHATSAPP_DISPLAY}). It&apos;s 100% free.
+                      Your details go straight to Coach Zain. It&apos;s 100% free.
                     </p>
                   </form>
                 )}
@@ -1351,7 +1384,7 @@ function ContactStrip() {
         <div className="text-center mb-12">
           <div className="eyebrow eyebrow-accent mb-6 mx-auto">Contact</div>
           <h2 className="text-section font-display font-bold tracking-tight text-foreground uppercase">
-            <SplitText text="Questions? Talk to Coach Zain" className="block" />
+            <SplitText text="Questions? Talk to Coach Zain" className="block justify-center" />
           </h2>
         </div>
         <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">

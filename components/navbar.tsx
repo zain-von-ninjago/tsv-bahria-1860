@@ -10,7 +10,7 @@ const navLinks = [
   { href: '#coach', label: 'Meet the Coach' },
   { href: '#success', label: 'Success Stories' },
   { href: '#training', label: 'How We Train' },
-  { href: '#waitlist', label: 'Age Groups & Fees' },
+  { href: '#contact', label: 'Contact' },
 ];
 
 export function Navbar() {
@@ -60,9 +60,13 @@ export function Navbar() {
             aria-label="TSV Bahria 1860 — back to top"
           >
             <img
-              src="/logo/tsv-bahria-1860-nobg.png"
+              src="/logo/tsv-bahria-1860-nobg.webp"
               alt=""
               aria-hidden="true"
+              width={32}
+              height={32}
+              fetchPriority="high"
+              decoding="async"
               className="h-8 w-8 object-contain transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 drop-shadow-[0_0_12px_rgba(0,212,170,0.45)]"
             />
             <span className="font-display font-semibold text-lg text-foreground group-hover:text-accent transition-colors duration-300 whitespace-nowrap">
@@ -71,30 +75,26 @@ export function Navbar() {
           </Link>
 
           <div className="hidden lg:flex items-center gap-6" role="menubar">
-            {navLinks.map((link, i) => {
-              const isWaitlist = link.href === '#waitlist';
-              return (
-                <a
-                  key={link.href}
-                  href={isWaitlist ? '#waitlist' : link.href}
-                  onClick={isWaitlist ? scrollToWaitlist : undefined}
-                  className="relative text-small font-medium text-foreground-muted hover:text-foreground transition-colors duration-300 group"
-                  role="menuitem"
-                  style={{ animationDelay: `${i * 50}ms` }}
-                >
-                  {link.label}
-                  <span className="absolute bottom-[-4px] left-0 h-[1px] w-0 bg-accent transition-all duration-300 group-hover:w-full" />
-                </a>
-              );
-            })}
+            {navLinks.map((link, i) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="relative text-small font-medium text-foreground-muted hover:text-foreground transition-colors duration-300 group"
+                role="menuitem"
+                style={{ animationDelay: `${i * 50}ms` }}
+              >
+                {link.label}
+                <span className="absolute bottom-[-4px] left-0 h-[1px] w-0 bg-accent transition-all duration-300 group-hover:w-full" />
+              </a>
+            ))}
           </div>
 
-          <a href="#waitlist" onClick={scrollToWaitlist} className="hidden md:inline-flex btn-primary !px-5 !py-2.5 !text-small relative overflow-hidden group/cta">
+          <a href="#waitlist" onClick={scrollToWaitlist} className="!hidden md:!inline-flex btn-primary !px-5 !py-2.5 !text-small relative overflow-hidden group/cta">
             <span
               className="pointer-events-none absolute inset-0 -translate-x-full bg-[linear-gradient(100deg,transparent,rgba(255,255,255,0.35),transparent)] transition-transform duration-700 group-hover/cta:translate-x-full"
               aria-hidden="true"
             />
-            Join Free Waitlist
+            Join
           </a>
 
           <button
@@ -158,20 +158,22 @@ export function Navbar() {
                 </motion.a>
               ))}
             </nav>
+
+            <motion.a
+              href="#waitlist"
+              onClick={scrollToWaitlist}
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.55, duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+              className="btn-primary !px-8 !py-3.5 !text-base justify-center"
+              role="menuitem"
+            >
+              <PhosphorIcons.Whatsapp className="h-5 w-5" strokeWidth={2} />
+              Join the Free Waitlist
+            </motion.a>
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Fixed bottom CTA on mobile — always visible for one-tap signup */}
-      <a
-        href="#waitlist"
-        onClick={scrollToWaitlist}
-        className="md:hidden fixed bottom-4 left-4 right-4 z-40 btn-primary justify-center shadow-2xl"
-        aria-label="Join the free waitlist"
-      >
-        <PhosphorIcons.Whatsapp className="h-5 w-5" strokeWidth={2} />
-        Join Free Waitlist
-      </a>
     </>
   );
 }

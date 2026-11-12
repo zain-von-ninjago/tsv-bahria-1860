@@ -977,6 +977,8 @@ function Waitlist() {
   const [submitting, setSubmitting] = useState(false);
   const [contactMissing, setContactMissing] = useState(false);
 
+  const [error, setError] = useState<string | null>(null);
+
   const age = parseInt(form.age, 10);
   const validAge = !isNaN(age) && age >= 7 && age <= 23;
   const squad = validAge ? squadForAge(age) : null;
@@ -1003,28 +1005,48 @@ function Waitlist() {
       `Email: ${form.email || '\u2014'}`,
     ].join('\n');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     if (!validAge) return;
-    // Either WhatsApp or email is enough to send the waitlist entry
     if (!canWhatsapp && !canEmail) {
       setContactMissing(true);
       return;
     }
     setSubmitting(true);
-    if (canWhatsapp) {
-      window.open(
-        `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(buildMessage())}`,
-        '_blank',
-        'noopener,noreferrer'
-      );
-    } else {
-      window.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent('TSV Bahria 1860 — Free Waitlist Sign-Up')}&body=${encodeURIComponent(buildMessage())}`;
-    }
-    setTimeout(() => {
-      setSubmitting(false);
+    try {
+      const res = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          age,
+          category: form.category,
+          position: form.position,
+          experience: form.experience,
+          strengths: form.strengths,
+          injuries: form.injuries,
+          whatsapp: form.whatsapp,
+          email: form.email,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Submission failed');
+      }
+      if (canWhatsapp) {
+        window.open(
+          `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(buildMessage())}`,
+          '_blank',
+          'noopener,noreferrer'
+        );
+      }
       setSubmitted(true);
-    }, 600);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -1312,6 +1334,9 @@ function Waitlist() {
                       </div>
                     </div>
 
+                    {error && (
+                      <p className="text-small text-red-400 text-center">{error}</p>
+                    )}
                     <button
                       type="submit"
                       disabled={submitting || !validAge}

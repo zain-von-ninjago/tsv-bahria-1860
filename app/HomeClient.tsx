@@ -257,18 +257,7 @@ export function HomeClient() {
   const isDesktop = useIsDesktop();
 
   return (
-    <SwarmCursor
-      count={70}
-      color="#00d4aa"
-      accentColor="#e8c56d"
-      shape="dot"
-      idle="roam"
-      clickEffect="burst"
-      targets="a, button, input, select, textarea"
-      enabled={!isMobile && !isTouchOnly}
-      className="contents"
-    >
-      <main id="top" className="relative min-h-screen pb-24 md:pb-0">
+    <main id="top" className="relative min-h-screen pb-24 md:pb-0">
         <Hero y={heroY} opacity={heroOpacity} reduce={!!reduceMotion} />
         <VelocityTicker />
         <WhyJoinUs />
@@ -281,7 +270,6 @@ export function HomeClient() {
         <Waitlist />
         <ContactStrip />
       </main>
-    </SwarmCursor>
   );
 }
 
